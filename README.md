@@ -1,5 +1,7 @@
 # dispctl
 
+[![CI](https://github.com/Forger7/dispctl/actions/workflows/ci.yml/badge.svg)](https://github.com/Forger7/dispctl/actions/workflows/ci.yml)
+
 Connect and disconnect macOS displays from the terminal.
 
 Disconnecting makes macOS treat a display as unplugged: windows evacuate, the desktop
@@ -28,6 +30,12 @@ space to toggle, `r` to refresh, `q` to quit.
 
 Requires macOS 13 (Ventura) or later on Apple Silicon, and a Swift toolchain
 (`xcode-select --install`).
+
+```sh
+brew install Forger7/tap/dispctl
+```
+
+Or from source:
 
 ```sh
 git clone https://github.com/Forger7/dispctl

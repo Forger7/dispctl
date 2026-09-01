@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # dispctl depends on a private API. Apple can remove it in a point release without
+  # anyone pushing a commit, so check on a schedule as well as on change.
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versions
+        run: |
+          sw_vers
+          swift --version
+
+      - name: Build
+        run: swift build -c release
+
+      - name: Smoke test
+        run: |
+          .build/release/dispctl --version
+          .build/release/dispctl help
+          # CI runners have no attached display; listing zero is a valid outcome,
+          # a non-zero exit is not.
+          .build/release/dispctl list
+
+  private-api:
+    name: private API still exported (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15, macos-latest]
+    steps:
+      - name: Check SLSConfigureDisplayEnabled
+        run: |
+          set -euo pipefail
+          skylight=/System/Library/PrivateFrameworks/SkyLight.framework/Versions/A/SkyLight
+          version=$(sw_vers -productVersion)
+          if dyld_info -exports "$skylight" | grep -q '_SLSConfigureDisplayEnabled'; then
+            echo "OK: SLSConfigureDisplayEnabled present on macOS $version"
+          else
+            echo "::error::SLSConfigureDisplayEnabled is gone on macOS $version — dispctl needs a new approach"
+            exit 1
+          fi
