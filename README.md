@@ -28,12 +28,15 @@ space to toggle, `r` to refresh, `q` to quit.
 
 ## Install
 
-Requires macOS 13 (Ventura) or later on Apple Silicon, and a Swift toolchain
-(`xcode-select --install`).
+Requires macOS 13 (Ventura) or later on Apple Silicon.
 
 ```sh
 brew install Forger7/tap/dispctl
 ```
+
+That pours a prebuilt binary, so no Swift toolchain is needed. If no bottle matches your
+machine, Homebrew builds from source instead, and that fallback does need one
+(`xcode-select --install`).
 
 Or from source:
 
